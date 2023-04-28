@@ -1,0 +1,112 @@
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+
+const Nav = styled.nav`
+  background-color: #0077b6;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+`;
+
+const BrandName = styled.h1`
+  margin: 0;
+`;
+
+const Button = styled.button`
+  background-color: #fff;
+  color: #0077b6;
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+`;
+
+const CardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1rem;
+`;
+
+const Card = styled.div`
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  padding: 1rem;
+`;
+
+const UserAvatar = styled.img`
+  border-radius: 50%;
+  height: 80px;
+  width: 80px;
+  margin-bottom: 0.5rem;
+`;
+
+const UserName = styled.h2`
+  font-size: 1.2rem;
+  margin: 0;
+`;
+
+const UserEmail = styled.p`
+  color: #777;
+  font-size: 0.8rem;
+  margin: 0;
+`;
+
+const Loader = styled.div`
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #0077b6;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+  margin: 1rem auto;
+  display: ${(props) => (props.loading ? "block" : "none")};
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const getUsers = async () => {
+    setLoading(true);
+    const res = await fetch("https://reqres.in/api/users?page=1");
+    const data = await res.json();
+    setUsers(data.data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  return (
+    <>
+      <Nav>
+        <BrandName>Brand Name</BrandName>
+        <Button onClick={getUsers}>Get Users</Button>
+      </Nav>
+      <Loader loading={loading} />
+      <CardGrid>
+        {users.map((user) => (
+          <Card key={user.id}>
+            <UserAvatar src={user.avatar} alt={user.first_name} />
+            <UserName>
+              {user.first_name} {user.last_name}
+            </UserName>
+            <UserEmail>{user.email}</UserEmail>
+          </Card>
+        ))}
+      </CardGrid>
+    </>
+  );
+};
+
+export default App;
